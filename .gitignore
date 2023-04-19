@@ -1,0 +1,9 @@
+.DS_Store
+.env
+.cache
+compile_commands.json
+target
+.vscode
+Makefile
+scripts
+src/InternalWatchdog.cpp
