@@ -1,6 +1,8 @@
 #include "Particle.h"
 
 SYSTEM_MODE(AUTOMATIC); 
+// SYSTEM_MODE(SEMI_AUTOMATIC); 
+// SYSTEM_MODE(MANUAL); 
 SYSTEM_THREAD(ENABLED);
 SerialLogHandler logHandler;
 
@@ -19,7 +21,7 @@ void setup() {
     Log.info("Start");
     
     bool rc = Watchdog.init(WatchdogConfiguration()
-      .timeout(30s));
+      .timeout(60s));
       // .capabilities(WatchdogCap::SLEEP_RUNNING)
 
     if(rc != SYSTEM_ERROR_NONE) {
@@ -45,18 +47,25 @@ void loop() {
     }
 
     Watchdog.refresh();
-    // // Go to sleep when Particle cloud connected
-    if(Particle.connected()) {
-        delay(5000);
-        Log.info("Going to sleep");
-        // Watchdog should autostop when sleeping 
-        uint64_t sleepTime = System.millis();
-        sleepResult = System.sleep(sleepConfig);
-        uint64_t wakeTime = System.millis();
-        Log.info("Sleep Time %d", sleepTime);
-        Log.info("Wake time %d", wakeTime);
-        delay(2000);
+    Particle.disconnect();
+    while(Particle.connected()) {
+        delay(100);
+        Watchdog.refresh();
     }
-    Watchdog.refresh();
+    Cellular.off();
+    while(!Cellular.isOff()) {
+        delay(100);
+        Watchdog.refresh();
+    }
+
+    Log.info("Going to sleep");
+    delay(5000);
+    // Watchdog should autostop when sleeping 
+    uint64_t sleepTime = System.millis();
+    sleepResult = System.sleep(sleepConfig);
+    uint64_t wakeTime = System.millis();
+    Log.info("Sleep Time %d", sleepTime);
+    Log.info("Wake time %d", wakeTime);
+    delay(2000);
 }
 
