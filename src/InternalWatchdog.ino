@@ -1,8 +1,8 @@
 #include "Particle.h"
 
-SYSTEM_MODE(AUTOMATIC); 
+// SYSTEM_MODE(AUTOMATIC); 
 // SYSTEM_MODE(SEMI_AUTOMATIC); 
-// SYSTEM_MODE(MANUAL); 
+SYSTEM_MODE(MANUAL); 
 SYSTEM_THREAD(ENABLED);
 SerialLogHandler logHandler;
 
@@ -35,8 +35,8 @@ void setup() {
     myTime = System.millis();
 
     sleepConfig.mode(SystemSleepMode::STOP)
-               .duration(40s) // Needs to be lower than keep alive perioud (default 23 min)
-               .network(NETWORK_INTERFACE_CELLULAR);
+               .duration(40s); // Needs to be lower than keep alive perioud (default 23 min)
+               // .network(NETWORK_INTERFACE_CELLULAR);
 }
 
 void loop() {
@@ -63,6 +63,8 @@ void loop() {
     // Watchdog should autostop when sleeping 
     uint64_t sleepTime = System.millis();
     sleepResult = System.sleep(sleepConfig);
+    Log.info("Wake from sleep, reason %d", sleepResult.wakeupReason());
+    Log.info("Sleep, error %d", sleepResult.error());
     uint64_t wakeTime = System.millis();
     Log.info("Sleep Time %d", sleepTime);
     Log.info("Wake time %d", wakeTime);
